@@ -6,8 +6,7 @@ import Observation
 enum TimeOfDay {
     case morning    // 6 am – 12 pm
     case midday     // 12 pm – 5 pm
-    case evening    // 5 pm – 11 pm (sunset trigger at 11 pm)
-    case night      // 11 pm – 6 am
+    case evening    // 5 pm – 6 am
 }
 
 // MARK: - ViewModel
@@ -19,25 +18,26 @@ final class TodayViewModel {
     var todayTasks: [TodoItem] = []
     var isAddingTask = false
 
+    private let dateService = DateService()
+
     // MARK: Derived — time of day
     // NOTE: Real implementation will use DateService. Direct Date() call here
     // is intentional for the stub; replace when DateService is injected.
     var timeOfDay: TimeOfDay {
         let hour = Calendar.current.component(.hour, from: Date())
         switch hour {
-        case 6..<23:  return .morning
-        //case 12..<17: return .midday
-        //case 17..<23: return .evening
-        default:      return .night
+        case 6..<12:  return .morning
+        case 12..<17: return .midday
+        default:      return .evening
         }
     }
 
     // MARK: Derived — background gradient
     var timeOfDayGradient: LinearGradient {
         switch timeOfDay {
-        case .morning:        return .todayMorning
-        case .midday:         return .todayMidday
-        case .evening, .night: return .todaySunset
+        case .morning: return .todayMorning
+        case .midday:  return .todayMidday
+        case .evening: return .todaySunset
         }
     }
 
@@ -55,9 +55,8 @@ final class TodayViewModel {
         if incomplete.isEmpty {
             switch timeOfDay {
             case .morning: return "A clean slate."
-            case .midday:  return "Four things."
+            case .midday:  return "The day is yours."
             case .evening: return "The day softens."
-            case .night:   return "Almost there."
             }
         }
         return countTitle(for: incomplete.count)
@@ -68,9 +67,8 @@ final class TodayViewModel {
         guard todayTasks.filter({ !$0.isCompleted }).isEmpty else { return nil }
         switch timeOfDay {
         case .morning: return "Begin gently."
-        case .midday:  return "Begin gently."
-        case .evening: return "An hour remains until midnight."
-        case .night:   return "Whatever's left, tomorrow is a clean start."
+        case .midday:  return "Keep going"
+        case .evening: return "\(dateService.timeRemainingUntilMidnight()) remain until midnight."
         }
     }
 

@@ -21,4 +21,14 @@ struct DateService {
     func minutesUntilEndOfDay() -> Int {
         max(0, Int(endOfToday.timeIntervalSince(Date()) / 60))
     }
+
+    func timeRemainingUntilMidnight() -> String {
+        let minutes = minutesUntilEndOfDay()
+        switch minutes {
+        case ..<2:   return "moments"
+        case ..<60:  return "\(minutes) minutes"
+        case ..<120: return "1 hour"
+        default:     return "\(minutes / 60) hours"
+        }
+    }
 }
