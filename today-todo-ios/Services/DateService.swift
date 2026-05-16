@@ -44,8 +44,10 @@ extension DateServiceProtocol {
         switch minutes {
         case ..<2:   return "moments"
         case ..<60:  return "\(minutes) minutes"
-        case ..<120: return "1 hour"
-        default:     return "\(minutes / 60) hours"
+        default:
+            // Round up if 30+ minutes past the hour, otherwise round down
+            let hours = (minutes + 30) / 60
+            return hours == 1 ? "1 hour" : "\(hours) hours"
         }
     }
 }
