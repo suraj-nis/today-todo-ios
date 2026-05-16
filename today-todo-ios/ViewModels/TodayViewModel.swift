@@ -18,13 +18,17 @@ final class TodayViewModel {
     var todayTasks: [TodoItem] = []
     var isAddingTask = false
 
-    private let dateService = DateService()
+    @ObservationIgnored
+    private let dateService: DateServiceProtocol
+
+    init(dateService: DateServiceProtocol = LiveDateService()) {
+        self.dateService = dateService
+    }
 
     // MARK: Derived — time of day
-    // NOTE: Real implementation will use DateService. Direct Date() call here
-    // is intentional for the stub; replace when DateService is injected.
+
     var timeOfDay: TimeOfDay {
-        let hour = Calendar.current.component(.hour, from: Date())
+        let hour = Calendar.current.component(.hour, from: dateService.now)
         switch hour {
         case 6..<12:  return .morning
         case 12..<17: return .midday
@@ -33,6 +37,7 @@ final class TodayViewModel {
     }
 
     // MARK: Derived — background gradient
+
     var timeOfDayGradient: LinearGradient {
         switch timeOfDay {
         case .morning: return .todayMorning
@@ -46,7 +51,7 @@ final class TodayViewModel {
     var dateKickerText: String {
         let f = DateFormatter()
         f.dateFormat = "EEEE  ·  MMM d"
-        return f.string(from: Date()).uppercased()
+        return f.string(from: dateService.now).uppercased()
     }
 
     /// Dynamic title: reflects task count when tasks exist; time-of-day copy when empty.
@@ -67,12 +72,12 @@ final class TodayViewModel {
         guard todayTasks.filter({ !$0.isCompleted }).isEmpty else { return nil }
         switch timeOfDay {
         case .morning: return "Begin gently."
-        case .midday:  return "Keep going"
-        case .evening: return "\(dateService.timeRemainingUntilMidnight()) remain until midnight."
+        case .midday:  return "Keep going."
+        case .evening: return "\(dateService.timeUntilMidnight()) remain until midnight."
         }
     }
 
-    // MARK: Actions (stubs — real logic added with Repository layer)
+    // MARK: Actions
 
     func toggleComplete(_ task: TodoItem) {
         guard let i = todayTasks.firstIndex(where: { $0.id == task.id }) else { return }
@@ -82,8 +87,8 @@ final class TodayViewModel {
     // MARK: - Private helpers
 
     private func countTitle(for n: Int) -> String {
-        let words = ["One","Two","Three","Four","Five",
-                     "Six","Seven","Eight","Nine","Ten"]
+        let words = ["One", "Two", "Three", "Four", "Five",
+                     "Six", "Seven", "Eight", "Nine", "Ten"]
         let word = n <= words.count ? words[n - 1] : "\(n)"
         return n == 1 ? "\(word) thing." : "\(word) things."
     }

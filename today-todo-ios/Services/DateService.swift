@@ -1,34 +1,67 @@
 import Foundation
 
-/// All date logic lives here. No View or ViewModel calls Date() directly.
-struct DateService {
-    var today: Date          { Date() }
-    var todayKey: String     { dayKey(for: Date()) }
-    var startOfToday: Date   { Calendar.current.startOfDay(for: Date()) }
-    var endOfToday: Date     { Calendar.current.date(byAdding: .day, value: 1, to: startOfToday) ?? Date() }
+// MARK: - Protocol
 
-    func dayKey(for date: Date) -> String {
+protocol DateServiceProtocol {
+    var now: Date { get }
+    var todayKey: String { get }
+    var startOfToday: Date { get }
+    var endOfToday: Date { get }
+    func isToday(_ item: TodoItem) -> Bool
+    func isExpired(_ item: TodoItem) -> Bool
+    func timeUntilMidnight() -> String
+}
+
+// MARK: - Default implementations
+
+extension DateServiceProtocol {
+
+    var todayKey: String {
         let f = DateFormatter()
         f.dateFormat = "yyyy-MM-dd"
-        return f.string(from: date)
+        return f.string(from: now)
     }
 
-    func isToday(_ item: TodoItem) -> Bool { item.dayKey == todayKey }
+    var startOfToday: Date {
+        Calendar.current.startOfDay(for: now)
+    }
+
+    var endOfToday: Date {
+        Calendar.current.date(byAdding: .day, value: 1, to: startOfToday) ?? now
+    }
+
+    func isToday(_ item: TodoItem) -> Bool {
+        item.dayKey == todayKey
+    }
+
     func isExpired(_ item: TodoItem) -> Bool {
         guard let exp = item.expiresAt else { return false }
-        return exp < Date()
-    }
-    func minutesUntilEndOfDay() -> Int {
-        max(0, Int(endOfToday.timeIntervalSince(Date()) / 60))
+        return exp < now
     }
 
-    func timeRemainingUntilMidnight() -> String {
-        let minutes = minutesUntilEndOfDay()
+    func timeUntilMidnight() -> String {
+        let minutes = max(0, Int(endOfToday.timeIntervalSince(now) / 60))
         switch minutes {
         case ..<2:   return "moments"
         case ..<60:  return "\(minutes) minutes"
         case ..<120: return "1 hour"
         default:     return "\(minutes / 60) hours"
         }
+    }
+}
+
+// MARK: - Live implementation
+
+struct LiveDateService: DateServiceProtocol {
+    var now: Date { Date() }
+}
+
+// MARK: - Mock (for testing)
+
+struct MockDateService: DateServiceProtocol {
+    var now: Date
+
+    init(now: Date) {
+        self.now = now
     }
 }

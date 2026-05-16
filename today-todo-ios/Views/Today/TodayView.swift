@@ -2,8 +2,12 @@ import SwiftUI
 
 struct TodayView: View {
 
-    @State private var viewModel = TodayViewModel()
+    @State private var viewModel: TodayViewModel
     @State private var isAddingTask = false
+
+    init(viewModel: TodayViewModel = TodayViewModel()) {
+        self._viewModel = State(initialValue: viewModel)
+    }
 
     @ScaledMetric(relativeTo: .body) private var fabSize        = AppConstants.fabSize
     @ScaledMetric(relativeTo: .body) private var fabBottomPad   = AppConstants.fabBottomPadding
