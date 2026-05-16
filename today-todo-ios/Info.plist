@@ -16,8 +16,10 @@
 	</array>
 	<key>UILaunchScreen</key>
 	<dict>
+		<key>UIColorName</key>
+		<string>launchScreenBackgroundColor</string>
 		<key>UIImageName</key>
-		<string>AppIcon</string>
+		<string>AppLogo</string>
 	</dict>
 </dict>
 </plist>
