@@ -14,5 +14,10 @@
 		<string>Geist-Medium.ttf</string>
 		<string>GeistMono-Regular.ttf</string>
 	</array>
+	<key>UILaunchScreen</key>
+	<dict>
+		<key>UIImageName</key>
+		<string>AppIcon</string>
+	</dict>
 </dict>
 </plist>

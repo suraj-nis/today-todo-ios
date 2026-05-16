@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct TodayTabBar: View {
+struct TodayTabBarView: View {
 
     var body: some View {
         TabView {
@@ -27,5 +27,5 @@ struct TodayTabBar: View {
 }
 
 #Preview {
-    TodayTabBar()
+    TodayTabBarView()
 }
