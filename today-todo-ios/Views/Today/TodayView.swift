@@ -13,12 +13,15 @@ struct TodayView: View {
     var body: some View {
         NavigationStack {
             ZStack(alignment: .bottomTrailing) {
-                backgroundLayer
-                scrollLayer
-                fabButton
+                
+                    backgroundLayer
+                    scrollLayer
+                    fabButton
+                
             }
             .navigationBarTitleDisplayMode(.inline)
             .toolbar(.hidden, for: .navigationBar)
+            
         }
         .sheet(isPresented: $isAddingTask) {
             // AddTaskSheet replaces this in Step 5

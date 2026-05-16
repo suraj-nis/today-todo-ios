@@ -38,7 +38,7 @@ enum AppConstants {
 
     /// Distance from the FAB's bottom edge to the bottom safe-area edge.
     /// Not in the 4pt spacing scale; kept here so it scales with the FAB.
-    static let fabBottomPadding: CGFloat = 56  // @ScaledMetric(relativeTo: .body)
+    static let fabBottomPadding: CGFloat = 24  // @ScaledMetric(relativeTo: .body)
 
     /// Width of the custom drag grabber drawn at the top of the add-task sheet.
     static let sheetGrabberWidth: CGFloat = 36  // @ScaledMetric(relativeTo: .body)

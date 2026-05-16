@@ -45,17 +45,17 @@ extension Font {
     /// Fraunces Regular 38pt — main/archive screen title; spec: "Serif 38/44, weight 400, tracking -0.6".
     static let todayScreenTitle   = Font.custom(FontName.fraunces400,  size: 38)
     /// Fraunces Regular 38pt — hero title on Today screen ("A clean slate." / task count line).
-    static let todayHeroTitle     = Font.custom(FontName.fraunces400,  size: 38)
+    static let todayHeroTitle     = Font.custom(FontName.fraunces400,  size: 45)
     /// Fraunces Light 18pt — empty-state and sunset subtitle; spec: weight 300, tracking -0.2, line-height 1.33.
-    static let todaySubtitle      = Font.custom(FontName.fraunces300i,  size: 18)
+    static let todaySubtitle      = Font.custom(FontName.fraunces300i,  size: 22)
     /// Fraunces LightItalic 22pt — empty state prompt "What matters today?"; spec: weight 300, italic, tracking -0.3, lh 30px.
     static let todayEmptyPrompt   = Font.custom(FontName.fraunces300i, size: 22)
     /// Fraunces LightItalic 22pt — empty state headline; weight 300, italic, tracking -0.3, lh 1.36.
-    static let todayEmptyHeadline = Font.custom(FontName.fraunces300i, size: 22)
+    static let todayEmptyHeadline = Font.custom(FontName.fraunces300i, size: 28)
     /// Geist Regular 13pt — empty state footnote; weight 400, tracking 0, lh 1.54.
-    static let todayEmptyFootnote = Font.custom(FontName.geist400,     size: 11)
+    static let todayEmptyFootnote = Font.custom(FontName.geist400,     size: 13)
     /// Fraunces Regular 11pt — date kicker label (uppercase, wide tracking).
-    static let todayDateKicker    = Font.custom(FontName.fraunces400,  size: 11)
+    static let todayDateKicker    = Font.custom(FontName.fraunces400,  size: 13)
 
     // Italic variants — true italics, not synthetic slant
     /// Fraunces Italic 32pt — italic title variant.
