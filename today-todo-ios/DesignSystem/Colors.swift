@@ -24,6 +24,13 @@ fileprivate extension Color {
     }
 }
 
+extension Color {
+    /// Convenience initializer for a fixed hex color (light and dark identical).
+    init(hex: String) {
+        self.init(UIColor(hex: hex))
+    }
+}
+
 // MARK: - Semantic colors
 
 extension Color {

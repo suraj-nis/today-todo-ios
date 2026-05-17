@@ -46,7 +46,7 @@ enum AppConstants {
     /// Height of the custom drag grabber.
     static let sheetGrabberHeight: CGFloat = 4   // @ScaledMetric(relativeTo: .body)
 
-    /// Diameter of the pulsing accent dot shown beside expiry timestamps at sunset.
+    /// Diameter of the filled dot shown beside expiry timestamps.
     /// Not in the 4pt spacing scale.
-    static let expiryDotSize: CGFloat = 5  // @ScaledMetric(relativeTo: .caption)
+    static let expiryDotSize: CGFloat = 3  // @ScaledMetric(relativeTo: .caption)
 }

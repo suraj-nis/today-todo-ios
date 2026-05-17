@@ -56,10 +56,11 @@ struct TodayView: View {
                         emptyContent
                             .frame(
                                 maxWidth: .infinity,
-                                minHeight: geo.size.height 
+                                minHeight: geo.size.height
                             )
                     } else {
                         taskList
+                            .padding(.top, Spacing.lg)
                     }
 
                     Spacer(minLength: fabSize + fabBottomPad + CGFloat(AppConstants.tabBarHeight))
@@ -109,7 +110,7 @@ struct TodayView: View {
     private var taskList: some View {
         LazyVStack(spacing: 0) {
             ForEach(Array(viewModel.todayTasks.enumerated()), id: \.element.id) { index, task in
-                TaskRowView(task: task) {
+                TaskRowView(task: task, timeOfDay: viewModel.timeOfDay) {
                     withAnimation(.circleComplete) {
                         viewModel.toggleComplete(task)
                     }
@@ -123,10 +124,7 @@ struct TodayView: View {
                 }
             }
         }
-        .background(Color.bgCanvas)
-        .clipShape(RoundedRectangle(cornerRadius: Radii.lg))
-        .shadowStyle(.raised)
-        .padding(.horizontal, Spacing.xxl)
+        .padding(.horizontal, -Spacing.sm)
     }
 
     // MARK: - FAB

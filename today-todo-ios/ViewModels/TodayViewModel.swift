@@ -15,7 +15,11 @@ enum TimeOfDay {
 final class TodayViewModel {
 
     // MARK: State
-    var todayTasks: [TodoItem] = []
+    var todayTasks: [TodoItem] = [TodoItem(id: UUID(), title: "Walk after lunch", isCompleted: false, createdAt: Date(), dayKey: "17", expiresAt: Date()),
+                                  TodoItem(id: UUID(), title: "Water the lemon tree", isCompleted: false, createdAt: Date(), dayKey: "17", expiresAt: Date()),
+                                  TodoItem(id: UUID(), title: "Read the Berry essay on attention", isCompleted: false, createdAt: Date(), dayKey: "17"),
+                                  TodoItem(id: UUID(), title: "Reply to Anna's letter", isCompleted: true, createdAt: Date(), dayKey: "17"),
+                                  TodoItem(id: UUID(), title: "Call mom", isCompleted: true, createdAt: Date(), dayKey: "17")]
     var isAddingTask = false
 
     @ObservationIgnored
@@ -67,9 +71,8 @@ final class TodayViewModel {
         return countTitle(for: incomplete.count)
     }
 
-    /// Shown only in empty + sunset states below the title.
+    
     var headerSubtitle: String? {
-        guard todayTasks.filter({ !$0.isCompleted }).isEmpty else { return nil }
         switch timeOfDay {
         case .morning: return "Begin gently."
         case .midday:  return "Keep going."

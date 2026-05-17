@@ -7,4 +7,5 @@ struct TodoItem: Identifiable, Codable, Equatable {
     let createdAt: Date
     let dayKey: String      // "yyyy-MM-dd" — buckets tasks by calendar day
     var expiresAt: Date?    // optional same-day expiry; always < end of createdAt day
+    
 }

@@ -5,21 +5,22 @@ struct CheckCircleView: View {
 
     let isCompleted: Bool
     let size: CGFloat
+    var borderColor: Color = Color.inkTertiary
 
     var body: some View {
         ZStack {
             Circle()
-                .fill(isCompleted ? Color.accent : Color.clear)
+                .fill(isCompleted ? Color.inkPrimary : Color.clear)
                 .overlay(
                     Circle()
-                        .stroke(isCompleted ? Color.accent : Color.inkQuaternary,
+                        .stroke(isCompleted ? Color.inkPrimary : borderColor,
                                 lineWidth: AppConstants.checkCircleStroke)
                 )
 
             if isCompleted {
                 Image(systemName: "checkmark")
                     .font(.system(size: size * 0.4, weight: .medium))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(Color.surfaceRaised)
             }
         }
         .frame(width: size, height: size)
