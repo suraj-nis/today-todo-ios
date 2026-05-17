@@ -64,6 +64,12 @@ extension Font {
     static let todayDisplayItalic = Font.custom(FontName.fraunces300i, size: 44)
     /// Geist Italic 17pt — add sheet placeholder, italic body.
     static let todayBodyItalic    = Font.custom(FontName.geist400i,    size: 17)
+
+    // Sheet-specific
+    /// Geist Regular 16pt — Cancel/Add action buttons in the add-task sheet.
+    static let todaySheetAction   = Font.custom(FontName.geist400,     size: 16)
+    /// Geist Regular 14pt — expiry row label in the add-task sheet.
+    static let todaySheetExpiry   = Font.custom(FontName.geist400,     size: 14)
 }
 
 // MARK: - Full type style
@@ -84,6 +90,8 @@ enum TodayTextStyle {
     case footnote
     case caption
     case dateKicker                    // 11pt Regular Fraunces — date kicker, tracking 1.4, uppercase
+    case sheetAction                   // 16pt Regular Geist — Cancel/Add sheet buttons
+    case sheetExpiry                   // 14pt Regular Geist — expiry row label
 
     var font: Font {
         switch self {
@@ -104,6 +112,8 @@ enum TodayTextStyle {
         case .footnote:       return .todayFootnote
         case .caption:        return .todayCaption
         case .dateKicker:     return .todayDateKicker
+        case .sheetAction:    return .todaySheetAction
+        case .sheetExpiry:    return .todaySheetExpiry
         }
     }
 
@@ -124,6 +134,8 @@ enum TodayTextStyle {
         case .subhead:                  return 4
         case .footnote:                 return 3
         case .caption, .dateKicker:     return 2
+        case .sheetAction:              return 4
+        case .sheetExpiry:              return 3
         }
     }
 
@@ -143,6 +155,8 @@ enum TodayTextStyle {
         case .footnote:                 return  0.0
         case .caption:                  return  0.6
         case .dateKicker:               return  1.4
+        case .sheetAction:              return -0.2
+        case .sheetExpiry:              return -0.1
         }
     }
 }

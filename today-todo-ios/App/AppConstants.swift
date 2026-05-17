@@ -49,4 +49,16 @@ enum AppConstants {
     /// Diameter of the filled dot shown beside expiry timestamps.
     /// Not in the 4pt spacing scale.
     static let expiryDotSize: CGFloat = 3  // @ScaledMetric(relativeTo: .caption)
+
+    /// Corner radius of the sheet drag-grabber pill.
+    static let sheetGrabberRadius: CGFloat = 2
+
+    /// Height of thin divider/hairline lines inside sheets.
+    static let hairlineWidth: CGFloat = 0.5
+
+    /// Minimum height of the text input area in the add-task sheet.
+    static let sheetMinTextHeight: CGFloat = 64
+
+    /// Size of the clock icon in the expiry row.
+    static let sheetClockIconSize: CGFloat = 14
 }

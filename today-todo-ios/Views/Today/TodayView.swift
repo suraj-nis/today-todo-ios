@@ -28,10 +28,7 @@ struct TodayView: View {
             
         }
         .sheet(isPresented: $isAddingTask) {
-            // AddTaskSheet replaces this in Step 5
-            Text("Add task — coming soon")
-                .presentationDetents([.medium])
-                .presentationCornerRadius(AppConstants.sheetCornerRadius)
+            AddTaskSheetView()
         }
     }
 

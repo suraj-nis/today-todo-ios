@@ -119,3 +119,12 @@ extension Color {
     /// The frosted glass fade applied above the tab bar on all time-of-day backgrounds.
     static let tabBarFrost = Color(light: "#F7F3EB", dark: "#1A1612")
 }
+
+// MARK: - Sheet UI colors
+
+extension Color {
+    /// Drag grabber pill color — between inkQuaternary and divider.
+    static let sheetGrabber = Color(light: "#D0C8B6", dark: "#3A332C")
+    /// Muted placeholder / inactive button color used inside sheets.
+    static let sheetMuted   = Color(light: "#988F82", dark: "#7A7268")
+}
