@@ -2,9 +2,11 @@ import SwiftUI
 
 struct TodayTabBarView: View {
 
+    let viewModel: TodayViewModel
+
     var body: some View {
         TabView {
-            TodayView()
+            TodayView(viewModel: viewModel)
                 .tabItem {
                     Label("TODAY", systemImage: "calendar")
                 }
@@ -27,5 +29,5 @@ struct TodayTabBarView: View {
 }
 
 #Preview {
-    TodayTabBarView()
+    TodayTabBarView(viewModel: TodayViewModel())
 }

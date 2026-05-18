@@ -14,22 +14,64 @@ enum TimeOfDay {
 @Observable
 final class TodayViewModel {
 
-    // MARK: State
-    var todayTasks: [TodoItem] = [TodoItem(id: UUID(), title: "Walk after lunch", isCompleted: false, createdAt: Date(), dayKey: "17", expiresAt: Date()),
-                                  TodoItem(id: UUID(), title: "Water the lemon tree", isCompleted: false, createdAt: Date(), dayKey: "17", expiresAt: Date()),
-                                  TodoItem(id: UUID(), title: "Read the Berry essay on attention", isCompleted: false, createdAt: Date(), dayKey: "17"),
-                                  TodoItem(id: UUID(), title: "Reply to Anna's letter", isCompleted: true, createdAt: Date(), dayKey: "17"),
-                                  TodoItem(id: UUID(), title: "Call mom", isCompleted: true, createdAt: Date(), dayKey: "17")]
-    var isAddingTask = false
+    // MARK: Private source of truth (insertion order)
 
-    @ObservationIgnored
-    private let dateService: DateServiceProtocol
+    private var items: [TodoItem] = []
 
-    init(dateService: DateServiceProtocol = LiveDateService()) {
+    @ObservationIgnored private let repository: TodoRepositoryProtocol
+    @ObservationIgnored private let dateService: DateServiceProtocol
+    @ObservationIgnored private let haptics = HapticService()
+
+    init(
+        repository: TodoRepositoryProtocol = UserDefaultsTodoRepository(),
+        dateService: DateServiceProtocol = LiveDateService()
+    ) {
+        self.repository  = repository
         self.dateService = dateService
+        load()
     }
 
-    // MARK: Derived — time of day
+    // MARK: - Derived — today filtered (unsorted)
+
+    private var todayItems: [TodoItem] {
+        items.filter { dateService.isToday($0) }
+    }
+
+    // MARK: - Derived — sorted display array
+
+    var sortedTodayTasks: [TodoItem] {
+        // Group 1: incomplete with expiry, not yet expired — most urgent first
+        let expiringTasks = todayItems
+            .filter { !$0.isCompleted && $0.expiresAt != nil && !dateService.isExpired($0) }
+            .sorted { $0.expiresAt! < $1.expiresAt! }
+
+        // Group 2: incomplete with no expiry — creation order
+        let nonExpiringTasks = todayItems
+            .filter { !$0.isCompleted && $0.expiresAt == nil }
+            .sorted { $0.createdAt < $1.createdAt }
+
+        // Group 3: completed — most recently completed first
+        let completedTasks = todayItems
+            .filter { $0.isCompleted }
+            .sorted {
+                ($0.completedAt ?? $0.createdAt) > ($1.completedAt ?? $1.createdAt)
+            }
+
+        // Group 4: expired (incomplete, past expiry time) — at the very bottom
+        let expiredTasks = todayItems
+            .filter { !$0.isCompleted && dateService.isExpired($0) }
+            .sorted { $0.expiresAt! < $1.expiresAt! }
+
+        return expiringTasks + nonExpiringTasks + completedTasks + expiredTasks
+    }
+
+    func isTaskExpired(_ task: TodoItem) -> Bool {
+        dateService.isExpired(task)
+    }
+
+    var isAtCapacity: Bool { todayItems.count >= 10 }
+
+    // MARK: - Derived — time of day
 
     var timeOfDay: TimeOfDay {
         let hour = Calendar.current.component(.hour, from: dateService.now)
@@ -40,8 +82,6 @@ final class TodayViewModel {
         }
     }
 
-    // MARK: Derived — background gradient
-
     var timeOfDayGradient: LinearGradient {
         switch timeOfDay {
         case .morning: return .todayMorning
@@ -50,7 +90,7 @@ final class TodayViewModel {
         }
     }
 
-    // MARK: Derived — header copy
+    // MARK: - Derived — header copy
 
     var dateKickerText: String {
         let f = DateFormatter()
@@ -58,9 +98,8 @@ final class TodayViewModel {
         return f.string(from: dateService.now).uppercased()
     }
 
-    /// Dynamic title: reflects task count when tasks exist; time-of-day copy when empty.
     var headerTitle: String {
-        let incomplete = todayTasks.filter { !$0.isCompleted }
+        let incomplete = sortedTodayTasks.filter { !$0.isCompleted && !dateService.isExpired($0) }
         if incomplete.isEmpty {
             switch timeOfDay {
             case .morning: return "A clean slate."
@@ -71,7 +110,6 @@ final class TodayViewModel {
         return countTitle(for: incomplete.count)
     }
 
-    
     var headerSubtitle: String? {
         switch timeOfDay {
         case .morning: return "Begin gently."
@@ -80,14 +118,53 @@ final class TodayViewModel {
         }
     }
 
-    // MARK: Actions
+    // MARK: - Actions
+
+    func addTask(title: String, expiresAt: Date? = nil) {
+        let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty, !isAtCapacity else { return }
+
+        let item = TodoItem(title: trimmed, expiresAt: expiresAt, dateService: dateService)
+        items.append(item)
+        persist()
+        haptics.impact(.soft)
+    }
+
+    func deleteTask(_ item: TodoItem) {
+        items.removeAll { $0.id == item.id }
+        persist()
+        haptics.impact(.medium)
+    }
 
     func toggleComplete(_ task: TodoItem) {
-        guard let i = todayTasks.firstIndex(where: { $0.id == task.id }) else { return }
-        todayTasks[i].isCompleted.toggle()
+        guard let i = items.firstIndex(where: { $0.id == task.id }) else { return }
+        items[i].isCompleted.toggle()
+        if items[i].isCompleted {
+            items[i].completedAt = dateService.now
+            haptics.notification(.success)
+        } else {
+            items[i].completedAt = nil
+            haptics.impact(.light)
+        }
+        persist()
+    }
+
+    // MARK: - Lifecycle
+
+    /// Re-loads from storage. Call on app foreground to handle midnight resets.
+    func refresh() {
+        load()
     }
 
     // MARK: - Private helpers
+
+    private func load() {
+        items = repository.loadAll()
+    }
+
+    private func persist() {
+        repository.save(items)
+    }
 
     private func countTitle(for n: Int) -> String {
         let words = ["One", "Two", "Three", "Four", "Five",

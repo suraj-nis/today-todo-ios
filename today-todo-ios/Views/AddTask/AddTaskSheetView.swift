@@ -2,17 +2,30 @@ import SwiftUI
 
 struct AddTaskSheetView: View {
 
+    let viewModel: TodayViewModel
+
     @State private var taskText = ""
     @State private var showingTimePicker = false
     @State private var expiryTime = Date()
+    @State private var minimumTime = Date()
     @State private var selectedDetent: PresentationDetent = .height(200)
+    @State private var currentTimeText = ""
     @Environment(\.dismiss) private var dismiss
 
     private var pickerRange: ClosedRange<Date> {
-        let startOfTomorrow = Calendar.current.startOfDay(
+        let endOfToday = Calendar.current.startOfDay(
             for: Calendar.current.date(byAdding: .day, value: 1, to: Date())!
         )
-        return Date()...startOfTomorrow
+        let lower = min(minimumTime, endOfToday)
+        return lower...endOfToday
+    }
+
+    private func nextWholeMinute() -> Date {
+        let plus60 = Date().addingTimeInterval(60)
+        let cal = Calendar.current
+        let seconds = cal.component(.second, from: plus60)
+        guard seconds > 0 else { return plus60 }
+        return cal.date(byAdding: .second, value: 60 - seconds, to: plus60) ?? plus60
     }
 
     var body: some View {
@@ -71,10 +84,21 @@ struct AddTaskSheetView: View {
 
             Spacer()
 
-            Button("Add") { }
-                .todayStyle(.sheetAction)
-                .foregroundStyle(taskText.isEmpty ? Color.inkQuaternary : Color.accent)
-                .disabled(taskText.isEmpty)
+            Button("Add") {
+                if viewModel.isAtCapacity {
+                    taskText = "That's enough for today."
+                    return
+                }
+                viewModel.addTask(
+                    title: taskText,
+                    expiresAt: showingTimePicker ? expiryTime : nil
+                )
+                taskText = ""
+                dismiss()
+            }
+            .todayStyle(.sheetAction)
+            .foregroundStyle(taskText.isEmpty ? Color.inkQuaternary : Color.accent)
+            .disabled(taskText.isEmpty)
         }
         .padding(.horizontal, Spacing.lg)
         .padding(.vertical, Spacing.sm)
@@ -111,14 +135,18 @@ struct AddTaskSheetView: View {
                 }
             } label: {
                 HStack(spacing: Spacing.xs) {
-                    Image(systemName: showingTimePicker ? "clock.fill" : "clock")
-                        .font(.system(size: AppConstants.sheetClockIconSize))
-                        .foregroundStyle(showingTimePicker ? Color.accent : Color.sheetMuted)
-                    Text(showingTimePicker
-                         ? expiryTime.formatted(date: .omitted, time: .shortened)
-                         : "Set an expiry time (optional)")
-                        .todayStyle(.sheetExpiry)
-                        .foregroundStyle(showingTimePicker ? Color.accent : Color.sheetMuted)
+                    if showingTimePicker {
+                        Image(systemName: "clock.fill")
+                            .font(.system(size: AppConstants.sheetClockIconSize))
+                            .foregroundStyle(Color.accent)
+                        Text(currentTimeText)
+                            .todayStyle(.sheetExpiry)
+                            .foregroundStyle(Color.accent)
+                    } else {
+                        Text("Set an expiry time (optional)")
+                            .todayStyle(.sheetExpiry)
+                            .foregroundStyle(Color.sheetMuted)
+                    }
                     Spacer()
                     if showingTimePicker {
                         Image(systemName: "xmark.circle.fill")
@@ -131,6 +159,11 @@ struct AddTaskSheetView: View {
                 .padding(.vertical, Spacing.md)
             }
             .buttonStyle(.plain)
+            .onAppear {
+                let f = DateFormatter()
+                f.dateFormat = "h:mm a"
+                currentTimeText = f.string(from: Date())
+            }
 
             if showingTimePicker {
                 DatePicker(
@@ -146,6 +179,12 @@ struct AddTaskSheetView: View {
                 .clipShape(RoundedRectangle(cornerRadius: Radii.md))
                 .padding(.horizontal, Spacing.lg)
                 .padding(.bottom, Spacing.md)
+                .onAppear {
+                    minimumTime = nextWholeMinute()
+                    if expiryTime < minimumTime {
+                        expiryTime = minimumTime
+                    }
+                }
             }
         }
     }
@@ -164,6 +203,6 @@ struct AddTaskSheetView: View {
 #Preview {
     Color.bgBase.ignoresSafeArea()
         .sheet(isPresented: .constant(true)) {
-            AddTaskSheetView()
+            AddTaskSheetView(viewModel: TodayViewModel())
         }
 }

@@ -30,7 +30,6 @@ struct EmptyStateView: View {
             }
 
             Spacer()
-            Spacer()
         }
         .frame(maxWidth: .infinity)
     }

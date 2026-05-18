@@ -8,23 +8,39 @@ private func fixedDate(hour: Int) -> Date {
     ) ?? Date()
 }
 
-private func makeVM(hour: Int, tasks: [TodoItem] = []) -> TodayViewModel {
-    let vm = TodayViewModel(dateService: MockDateService(now: fixedDate(hour: hour)))
-    vm.todayTasks = tasks
-    return vm
+/// In-memory repository used only in Xcode previews.
+private final class PreviewRepository: TodoRepositoryProtocol {
+    private var items: [TodoItem]
+    init(_ items: [TodoItem] = []) { self.items = items }
+    func loadAll() -> [TodoItem] { items }
+    func save(_ items: [TodoItem]) { self.items = items }
 }
 
-private let sampleTasks: [TodoItem] = {
-    let key = LiveDateService().todayKey
+private func makeVM(hour: Int, tasks: [TodoItem] = []) -> TodayViewModel {
+    let dateService = MockDateService(now: fixedDate(hour: hour))
+    let repo = PreviewRepository(tasks)
+    return TodayViewModel(repository: repo, dateService: dateService)
+}
+
+private func expiredTask(title: String, minutesAgo: Int, dateService: DateServiceProtocol) -> TodoItem {
+    let expiry = dateService.now.addingTimeInterval(-Double(minutesAgo) * 60)
+    return TodoItem(title: title, expiresAt: expiry, dateService: dateService)
+}
+
+private let sampleTasks: [TodoItem] = [
+    TodoItem(title: "Walk after lunch"),
+    TodoItem(title: "Read the Berry essay on attention"),
+    TodoItem(title: "Call the landlord"),
+]
+
+private func expiredTasks(hour: Int) -> [TodoItem] {
+    let ds = MockDateService(now: fixedDate(hour: hour))
     return [
-        TodoItem(id: UUID(), title: "Walk after lunch",
-                 isCompleted: false, createdAt: Date(), dayKey: key),
-        TodoItem(id: UUID(), title: "Read the Berry essay on attention",
-                 isCompleted: true,  createdAt: Date(), dayKey: key),
-        TodoItem(id: UUID(), title: "Call the landlord",
-                 isCompleted: false, createdAt: Date(), dayKey: key),
+        expiredTask(title: "Reply to Marcus", minutesAgo: 90, dateService: ds),
+        expiredTask(title: "Submit the form before noon", minutesAgo: 30, dateService: ds),
+        TodoItem(title: "Water the plants"),
     ]
-}()
+}
 
 // MARK: - Preview shell (mirrors TodayTabBar layout)
 
@@ -32,28 +48,7 @@ private struct PreviewShell: View {
     let viewModel: TodayViewModel
 
     var body: some View {
-        TabView {
-            TodayView(viewModel: viewModel)
-                .tabItem {
-                    Image(systemName: "calendar")
-                    Text("TODAY")
-                }
-            ArchiveView()
-                .tabItem {
-                    Image(systemName: "archivebox")
-                    Text("ARCHIVE")
-                }
-        }
-        .tint(Color.accent)
-        .toolbarBackground(.hidden, for: .tabBar)
-        .onAppear {
-            UITabBar.appearance().backgroundImage = UIImage()
-            UITabBar.appearance().shadowImage    = UIImage()
-            UITabBar.appearance().backgroundColor = .clear
-            UITabBar.appearance().isTranslucent   = true
-            UITabBar.appearance().itemPositioning = .centered
-            UITabBar.appearance().itemSpacing     = 70
-        }
+        TodayTabBarView(viewModel: viewModel)
     }
 }
 
@@ -85,4 +80,14 @@ private struct PreviewShell: View {
 
 #Preview("Evening — With Tasks") {
     PreviewShell(viewModel: makeVM(hour: 19, tasks: sampleTasks))
+}
+
+// MARK: - Expired tasks
+
+#Preview("Morning — Expired Tasks") {
+    PreviewShell(viewModel: makeVM(hour: 10, tasks: expiredTasks(hour: 10)))
+}
+
+#Preview("Evening — Expired Tasks") {
+    PreviewShell(viewModel: makeVM(hour: 19, tasks: expiredTasks(hour: 19)))
 }

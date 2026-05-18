@@ -28,7 +28,7 @@ struct TodayView: View {
             
         }
         .sheet(isPresented: $isAddingTask) {
-            AddTaskSheetView()
+            AddTaskSheetView(viewModel: viewModel)
         }
     }
 
@@ -42,30 +42,56 @@ struct TodayView: View {
     // MARK: - Scrollable content
 
     private var scrollLayer: some View {
-        GeometryReader { geo in
-            ScrollView {
-                VStack(alignment: .leading, spacing: 0) {
-                    headerSection
-                        .padding(.horizontal, Spacing.lg)
-                        .padding(.top, Spacing.xxl)
+        List {
+            headerSection
+                .padding(.horizontal, Spacing.lg)
+                .padding(.top, Spacing.sm)
+                .padding(.bottom, Spacing.md)
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets())
 
-                    if viewModel.todayTasks.isEmpty {
-                        emptyContent
-                            .frame(
-                                maxWidth: .infinity,
-                                minHeight: geo.size.height
-                            )
-                    } else {
-                        taskList
-                            .padding(.top, Spacing.lg)
+            if viewModel.sortedTodayTasks.isEmpty {
+                emptyContent
+                    .frame(minHeight: 480)
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets())
+            } else {
+                ForEach(viewModel.sortedTodayTasks) { task in
+                    TaskRowView(task: task, timeOfDay: viewModel.timeOfDay,
+                               isExpired: viewModel.isTaskExpired(task)) {
+                        withAnimation(.circleComplete) {
+                            viewModel.toggleComplete(task)
+                        }
                     }
-
-                    Spacer(minLength: fabSize + fabBottomPad + CGFloat(AppConstants.tabBarHeight))
+                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                        Button(role: .destructive) {
+                            withAnimation(.rowDelete) {
+                                viewModel.deleteTask(task)
+                            }
+                        } label: {
+                            Label("Delete", systemImage: "trash")
+                        }
+                    }
+                    .listRowBackground(Color.clear)
+                    .listRowSeparator(.hidden)
+                    .listRowInsets(EdgeInsets(
+                        top: 0, leading: -Spacing.md,
+                        bottom: 0, trailing: 0))
                 }
-                .frame(minHeight: geo.size.height, alignment: .top)
             }
-            .scrollIndicators(.hidden)
+
+            Color.clear
+                .frame(height: fabSize + fabBottomPad + AppConstants.tabBarHeight)
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets())
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
+        .scrollIndicators(.hidden)
+        .padding(.top, Spacing.lg)
     }
 
     // MARK: - Header
@@ -100,28 +126,6 @@ struct TodayView: View {
 
     private var emptyContent: some View {
         EmptyStateView()
-    }
-
-    // MARK: - Task list
-
-    private var taskList: some View {
-        LazyVStack(spacing: 0) {
-            ForEach(Array(viewModel.todayTasks.enumerated()), id: \.element.id) { index, task in
-                TaskRowView(task: task, timeOfDay: viewModel.timeOfDay) {
-                    withAnimation(.circleComplete) {
-                        viewModel.toggleComplete(task)
-                    }
-                }
-
-                if index < viewModel.todayTasks.count - 1 {
-                    Divider()
-                        .background(Color.divider)
-                        // Indent divider to align with task text, past circle + gap
-                        .padding(.leading, Spacing.xxl + AppConstants.checkCircleSize + Spacing.md)
-                }
-            }
-        }
-        .padding(.horizontal, -Spacing.sm)
     }
 
     // MARK: - FAB
