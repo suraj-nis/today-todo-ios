@@ -3,7 +3,17 @@ import SwiftUI
 struct AddTaskSheetView: View {
 
     @State private var taskText = ""
+    @State private var showingTimePicker = false
+    @State private var expiryTime = Date()
+    @State private var selectedDetent: PresentationDetent = .height(200)
     @Environment(\.dismiss) private var dismiss
+
+    private var pickerRange: ClosedRange<Date> {
+        let startOfTomorrow = Calendar.current.startOfDay(
+            for: Calendar.current.date(byAdding: .day, value: 1, to: Date())!
+        )
+        return Date()...startOfTomorrow
+    }
 
     var body: some View {
         VStack(spacing: 0) {
@@ -16,7 +26,7 @@ struct AddTaskSheetView: View {
             expiryRow
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
-        .presentationDetents([.height(200)])
+        .presentationDetents([.height(200), .height(420)], selection: $selectedDetent)
         .presentationCornerRadius(AppConstants.sheetCornerRadius)
         .presentationDragIndicator(.hidden)
         .presentationBackground(Color(hex: "#F2EEE6"))
@@ -90,20 +100,54 @@ struct AddTaskSheetView: View {
         .padding(.top, Spacing.md)
     }
 
-    // MARK: - Expiry row
+    // MARK: - Expiry row + picker
 
     private var expiryRow: some View {
-        HStack(spacing: Spacing.xs) {
-            Image(systemName: "clock")
-                .font(.system(size: AppConstants.sheetClockIconSize))
-                .foregroundStyle(Color.sheetMuted)
-            Text("Set an expiry time (optional)")
-                .todayStyle(.sheetExpiry)
-                .foregroundStyle(Color.sheetMuted)
+        VStack(spacing: 0) {
+            Button {
+                withAnimation(.paper(duration: MotionDuration.medium)) {
+                    showingTimePicker.toggle()
+                    selectedDetent = showingTimePicker ? .height(420) : .height(200)
+                }
+            } label: {
+                HStack(spacing: Spacing.xs) {
+                    Image(systemName: showingTimePicker ? "clock.fill" : "clock")
+                        .font(.system(size: AppConstants.sheetClockIconSize))
+                        .foregroundStyle(showingTimePicker ? Color.accent : Color.sheetMuted)
+                    Text(showingTimePicker
+                         ? expiryTime.formatted(date: .omitted, time: .shortened)
+                         : "Set an expiry time (optional)")
+                        .todayStyle(.sheetExpiry)
+                        .foregroundStyle(showingTimePicker ? Color.accent : Color.sheetMuted)
+                    Spacer()
+                    if showingTimePicker {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: AppConstants.sheetClockIconSize))
+                            .foregroundStyle(Color.inkQuaternary)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, Spacing.lg)
+                .padding(.vertical, Spacing.md)
+            }
+            .buttonStyle(.plain)
+
+            if showingTimePicker {
+                DatePicker(
+                    "",
+                    selection: $expiryTime,
+                    in: pickerRange,
+                    displayedComponents: .hourAndMinute
+                )
+                .datePickerStyle(.wheel)
+                .labelsHidden()
+                .frame(maxWidth: .infinity)
+                .background(Color(hex: "#F2EEE6"))
+                .clipShape(RoundedRectangle(cornerRadius: Radii.md))
+                .padding(.horizontal, Spacing.lg)
+                .padding(.bottom, Spacing.md)
+            }
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.horizontal, Spacing.lg)
-        .padding(.vertical, Spacing.md)
     }
 
     // MARK: - Helpers
@@ -118,8 +162,7 @@ struct AddTaskSheetView: View {
 // MARK: - Preview
 
 #Preview {
-    Color.bgBase
-        .ignoresSafeArea()
+    Color.bgBase.ignoresSafeArea()
         .sheet(isPresented: .constant(true)) {
             AddTaskSheetView()
         }
