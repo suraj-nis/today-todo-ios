@@ -1,0 +1,57 @@
+# ── Xcode user data ─────────────────────────────────────────────────────────
+# Never commit per-user UI state or local scheme overrides.
+xcuserdata/
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+
+# ── Xcode workspace shared data ──────────────────────────────────────────────
+# xcshareddata/ (shared schemes) is intentionally NOT ignored — commit it.
+# Only the user-specific subfolder inside xcworkspace is excluded above.
+
+# ── DerivedData & build artifacts ────────────────────────────────────────────
+DerivedData/
+build/
+*.o
+*.d
+
+# ── Swift Package Manager ─────────────────────────────────────────────────────
+.swiftpm/
+.build/
+
+# ── CocoaPods (not used, but guard against accidental init) ──────────────────
+Pods/
+Podfile.lock
+
+# ── Fastlane ─────────────────────────────────────────────────────────────────
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# ── macOS filesystem noise ────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# ── Design export folder ─────────────────────────────────────────────────────
+# Source of truth lives in Figma/the design tool — this is a local export only.
+DesignExport/
+
+# ── Temporary font downloads ──────────────────────────────────────────────────
+/tmp/
+
+# ── Crash logs ───────────────────────────────────────────────────────────────
+*.crash
+
+# ── Secrets & certificates ───────────────────────────────────────────────────
+.env
+.env.*
+*.pem
+*.p12
+*.mobileprovision
+*.cer
