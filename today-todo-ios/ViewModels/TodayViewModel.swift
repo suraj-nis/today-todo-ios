@@ -1,5 +1,6 @@
 import SwiftUI
 import Observation
+import WidgetKit
 
 // MARK: - Time-of-day state
 
@@ -124,15 +125,22 @@ final class TodayViewModel {
         let trimmed = title.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty, !isAtCapacity else { return }
 
-        let item = TodoItem(title: trimmed, expiresAt: expiresAt, dateService: dateService)
+        let item = TodoItem(
+            title:     trimmed,
+            createdAt: dateService.now,
+            dayKey:    dateService.todayKey,
+            expiresAt: expiresAt
+        )
         items.append(item)
         persist()
+        WidgetCenter.shared.reloadAllTimelines()
         haptics.impact(.soft)
     }
 
     func deleteTask(_ item: TodoItem) {
         items.removeAll { $0.id == item.id }
         persist()
+        WidgetCenter.shared.reloadAllTimelines()
         haptics.impact(.medium)
     }
 
@@ -147,6 +155,7 @@ final class TodayViewModel {
             haptics.impact(.light)
         }
         persist()
+        WidgetCenter.shared.reloadAllTimelines()
     }
 
     // MARK: - Lifecycle

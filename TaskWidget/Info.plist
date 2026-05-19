@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>NSExtension</key>
+	<dict>
+		<key>NSExtensionPointIdentifier</key>
+		<string>com.apple.widgetkit-extension</string>
+	</dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Fraunces144pt-Light.ttf</string>
+		<string>Fraunces144pt-LightItalic.ttf</string>
+		<string>Fraunces144pt-Regular.ttf</string>
+		<string>Fraunces144pt-Italic.ttf</string>
+		<string>Fraunces144pt-SemiBold.ttf</string>
+		<string>Geist-Regular.ttf</string>
+		<string>Geist-Italic.ttf</string>
+		<string>Geist-Medium.ttf</string>
+		<string>GeistMono-Regular.ttf</string>
+	</array>
+</dict>
+</plist>

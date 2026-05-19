@@ -1,5 +1,22 @@
 import SwiftUI
 
+// MARK: - Preview-only convenience init
+//
+// Restores the old TodoItem(title:expiresAt:dateService:) signature so all
+// preview call sites below stay unchanged. Not compiled into the widget target.
+
+private extension TodoItem {
+    init(title: String, expiresAt: Date? = nil,
+         dateService: DateServiceProtocol = LiveDateService()) {
+        self.init(
+            title:     title,
+            createdAt: dateService.now,
+            dayKey:    dateService.todayKey,
+            expiresAt: expiresAt
+        )
+    }
+}
+
 // MARK: - Helpers
 
 private func fixedDate(hour: Int) -> Date {
