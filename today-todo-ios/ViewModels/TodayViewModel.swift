@@ -19,17 +19,22 @@ final class TodayViewModel {
 
     private var items: [TodoItem] = []
 
-    @ObservationIgnored private let repository: TodoRepositoryProtocol
-    @ObservationIgnored private let dateService: DateServiceProtocol
+    @ObservationIgnored private let repository:        TodoRepositoryProtocol
+    @ObservationIgnored private let dateService:       DateServiceProtocol
+    @ObservationIgnored private let archiveRepository: ArchiveRepositoryProtocol
     @ObservationIgnored private let haptics = HapticService()
 
     init(
-        repository: TodoRepositoryProtocol = UserDefaultsTodoRepository(),
-        dateService: DateServiceProtocol = LiveDateService()
+        dateService:       DateServiceProtocol       = LiveDateService(),
+        repository:        TodoRepositoryProtocol    = UserDefaultsTodoRepository(),
+        archiveRepository: ArchiveRepositoryProtocol = UserDefaultsArchiveRepository()
     ) {
-        self.repository  = repository
-        self.dateService = dateService
+        self.dateService       = dateService
+        self.repository        = repository
+        self.archiveRepository = archiveRepository
         load()
+        performDayReset()
+        scheduleMidnightReset()
     }
 
     // MARK: - Derived — today filtered (unsorted)
@@ -41,24 +46,18 @@ final class TodayViewModel {
     // MARK: - Derived — sorted display array
 
     var sortedTodayTasks: [TodoItem] {
-        // Group 1: incomplete with expiry, not yet expired — most urgent first
         let expiringTasks = todayItems
             .filter { !$0.isCompleted && $0.expiresAt != nil && !dateService.isExpired($0) }
             .sorted { $0.expiresAt! < $1.expiresAt! }
 
-        // Group 2: incomplete with no expiry — creation order
         let nonExpiringTasks = todayItems
             .filter { !$0.isCompleted && $0.expiresAt == nil }
             .sorted { $0.createdAt < $1.createdAt }
 
-        // Group 3: completed — most recently completed first
         let completedTasks = todayItems
             .filter { $0.isCompleted }
-            .sorted {
-                ($0.completedAt ?? $0.createdAt) > ($1.completedAt ?? $1.createdAt)
-            }
+            .sorted { ($0.completedAt ?? $0.createdAt) > ($1.completedAt ?? $1.createdAt) }
 
-        // Group 4: expired (incomplete, past expiry time) — at the very bottom
         let expiredTasks = todayItems
             .filter { !$0.isCompleted && dateService.isExpired($0) }
             .sorted { $0.expiresAt! < $1.expiresAt! }
@@ -160,10 +159,84 @@ final class TodayViewModel {
 
     // MARK: - Lifecycle
 
-    /// Re-loads from storage. Call on app foreground to handle midnight resets.
+    /// Reloads from storage and runs a day reset check.
+    /// Call on app foreground to handle waking after midnight.
     func refresh() {
         load()
+        performDayReset()
     }
+
+    // MARK: - Day reset
+
+    /// Moves all non-today tasks into the archive, then removes them from the
+    /// active list. Idempotent — safe to call multiple times.
+    private func performDayReset() {
+        let todayKey      = dateService.todayKey
+        let previousTasks = items.filter { $0.dayKey != todayKey }
+        print("DEBUG: previousTasks count: \(previousTasks.count)")
+        guard !previousTasks.isEmpty else { return }
+
+        let grouped = Dictionary(grouping: previousTasks, by: { $0.dayKey })
+        print("DEBUG: grouped keys: \(grouped.keys)")
+        for (dayKey, tasks) in grouped {
+            guard let date = dateService.dateFromKey(dayKey) else { continue }
+            archiveRepository.archiveTasks(tasks, for: date)
+        }
+
+        items.removeAll { $0.dayKey != todayKey }
+        persist()
+        WidgetCenter.shared.reloadAllTimelines()
+        NotificationCenter.default.post(name: .archiveDidUpdate, object: nil)
+    }
+
+    /// Schedules a single fire exactly at the next midnight, then reschedules
+    /// itself so the ViewModel self-maintains across days without requiring
+    /// the user to background/foreground the app.
+    private func scheduleMidnightReset() {
+        let now      = dateService.now
+        let calendar = Calendar.current
+        let tomorrow = calendar.date(byAdding: .day, value: 1, to: now) ?? now
+        let midnight = calendar.startOfDay(for: tomorrow)
+        let delay    = midnight.timeIntervalSince(now)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            self?.performDayReset()
+            self?.scheduleMidnightReset()
+        }
+    }
+
+    // MARK: - Debug helpers
+
+#if DEBUG
+    func simulateDayReset(daysAgo: Int = 1) {
+        let calendar = Calendar.current
+        guard let pastDate = calendar.date(byAdding: .day, value: -daysAgo, to: dateService.now)
+        else { return }
+
+        let pastDayKey = dateService.dayKey(for: pastDate)
+
+        var existing = archiveRepository.loadAll()
+        existing.removeAll { dateService.dayKey(for: $0.date) == pastDayKey }
+        archiveRepository.save(existing)
+
+        items = items.map { task in
+            TodoItem(
+                id:          task.id,
+                title:       task.title,
+                isCompleted: task.isCompleted,
+                completedAt: task.completedAt,
+                createdAt:   pastDate,
+                dayKey:      pastDayKey,
+                expiresAt:   task.expiresAt
+            )
+        }
+
+        repository.save(items)
+        print("DEBUG: items before reset: \(items.count)")
+        print("DEBUG: pastDayKey: \(pastDayKey)")
+        performDayReset()
+    }
+#endif
 
     // MARK: - Private helpers
 

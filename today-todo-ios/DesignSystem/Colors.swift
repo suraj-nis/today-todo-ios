@@ -128,3 +128,26 @@ extension Color {
     /// Muted placeholder / inactive button color used inside sheets.
     static let sheetMuted   = Color(light: "#988F82", dark: "#7A7268")
 }
+
+// MARK: - Archive UI colors
+
+extension Color {
+    /// Deep warm brown — archive header title, day section name.
+    static let archiveInkDark    = Color(hex: "#3A2516")
+    /// Medium warm brown — archive subtitle, completed task title.
+    static let archiveInkWarm    = Color(hex: "#6B4A30")
+    /// Muted rose — archive kicker, expired task title base.
+    static let archiveInkRose    = Color(hex: "#A08585")
+    /// Warm tan — date labels in day section headers (morning/midday).
+    static let archiveDateLabel  = Color(hex: "#A08568")
+    /// Terracotta-rose — completed task circle fill in archive; evening kicker/date label override.
+    static let archiveCircleFill         = Color(hex: "#9C5851")
+    /// Deep wine — archive subtitle color in evening state.
+    static let archiveEveningSubtitle    = Color(hex: "#6E2E2E")
+    /// Pale warm rose — incomplete/expired circle border in evening state; muted title in all states.
+    static let archiveEveningBorder      = Color(hex: "#D6B0A6")
+    /// Warm rose — section divider line in evening state.
+    static let archiveEveningDivider     = Color(hex: "#C47A6E")
+    /// Warm sand — incomplete/expired circle border in morning and midday.
+    static let archiveMornBorder         = Color(hex: "#D4C2A8")
+}

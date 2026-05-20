@@ -82,6 +82,14 @@ struct TodayView: View {
                 }
             }
 
+#if DEBUG
+            debugButton
+                .frame(maxWidth: .infinity, alignment: .center)
+                .listRowBackground(Color.clear)
+                .listRowSeparator(.hidden)
+                .listRowInsets(EdgeInsets())
+#endif
+
             Color.clear
                 .frame(height: fabSize + fabBottomPad + AppConstants.tabBarHeight)
                 .listRowBackground(Color.clear)
@@ -127,6 +135,19 @@ struct TodayView: View {
     private var emptyContent: some View {
         EmptyStateView()
     }
+
+    // MARK: - Debug
+
+#if DEBUG
+    private var debugButton: some View {
+        Button("Simulate Day Reset") {
+            viewModel.simulateDayReset(daysAgo: 1)
+        }
+        .font(.caption)
+        .foregroundStyle(Color.accent)
+        .padding()
+    }
+#endif
 
     // MARK: - FAB
 

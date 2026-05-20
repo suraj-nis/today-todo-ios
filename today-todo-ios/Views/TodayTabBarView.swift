@@ -10,7 +10,7 @@ struct TodayTabBarView: View {
                 .tabItem {
                     Label("TODAY", systemImage: "calendar")
                 }
-            ArchiveView()
+            ArchiveView(timeOfDay: viewModel.timeOfDay)
                 .tabItem {
                     Label("ARCHIVE", systemImage: "archivebox")
                 }

@@ -71,6 +71,7 @@
 		F3842DA82FBD188800135D8F /* Exceptions for "today-todo-ios" folder in "TaskWidgetExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Models/TodoItem.swift,
 				"Resources/Fonts/Fraunces144pt-Italic.ttf",
 				"Resources/Fonts/Fraunces144pt-Light.ttf",
 				"Resources/Fonts/Fraunces144pt-LightItalic.ttf",
@@ -83,7 +84,6 @@
 				"Resources/Fonts/GeistMono-Medium.otf",
 				"Resources/Fonts/GeistMono-Regular.otf",
 				Shared/SharedTodoStore.swift,
-				Shared/TodoItem.swift,
 			);
 			target = F3842D7F2FBD10CF00135D8F /* TaskWidgetExtension */;
 		};

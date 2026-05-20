@@ -57,6 +57,16 @@ extension Font {
     /// Fraunces Regular 11pt — date kicker label (uppercase, wide tracking).
     static let todayDateKicker    = Font.custom(FontName.fraunces400,  size: 13)
 
+    // Archive-specific
+    /// Fraunces SemiBold 26pt — archive day section name ("Yesterday", "Monday").
+    static let archiveDayName     = Font.custom(FontName.fraunces600,  size: 26)
+    /// Fraunces Light Italic 18pt — archive header subtitle.
+    static let archiveSubtitle    = Font.custom(FontName.fraunces300,  size: 18)
+    /// Fraunces Regular 16pt — archive task row titles.
+    static let archiveTaskTitle   = Font.custom(FontName.fraunces400,  size: 16)
+    /// Geist Mono Regular 9pt — "— EXPIRED UNTOUCHED" sublabel; smaller than caption.
+    static let archiveExpiredLabel = Font.custom(FontName.geistMono400, size: 9)
+
     // Italic variants — true italics, not synthetic slant
     /// Fraunces Italic 32pt — italic title variant.
     static let todayTitleItalic   = Font.custom(FontName.fraunces400i, size: 32)

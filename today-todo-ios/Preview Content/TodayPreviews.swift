@@ -36,7 +36,7 @@ private final class PreviewRepository: TodoRepositoryProtocol {
 private func makeVM(hour: Int, tasks: [TodoItem] = []) -> TodayViewModel {
     let dateService = MockDateService(now: fixedDate(hour: hour))
     let repo = PreviewRepository(tasks)
-    return TodayViewModel(repository: repo, dateService: dateService)
+    return TodayViewModel( dateService: dateService,repository: repo)
 }
 
 private func expiredTask(title: String, minutesAgo: Int, dateService: DateServiceProtocol) -> TodoItem {

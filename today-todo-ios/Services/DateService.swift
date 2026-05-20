@@ -7,6 +7,11 @@ protocol DateServiceProtocol {
     var todayKey: String { get }
     var startOfToday: Date { get }
     var endOfToday: Date { get }
+    func dayKey(for date: Date) -> String
+    func dateFromKey(_ key: String) -> Date?
+    func dayName(for date: Date) -> String
+    func dateLabel(for date: Date) -> String
+    func isYesterday(_ date: Date) -> Bool
     func isToday(_ item: TodoItem) -> Bool
     func isExpired(_ item: TodoItem) -> Bool
     func timeUntilMidnight() -> String
@@ -16,11 +21,7 @@ protocol DateServiceProtocol {
 
 extension DateServiceProtocol {
 
-    var todayKey: String {
-        let f = DateFormatter()
-        f.dateFormat = "yyyy-MM-dd"
-        return f.string(from: now)
-    }
+    var todayKey: String { dayKey(for: now) }
 
     var startOfToday: Date {
         Calendar.current.startOfDay(for: now)
@@ -28,6 +29,39 @@ extension DateServiceProtocol {
 
     var endOfToday: Date {
         Calendar.current.date(byAdding: .day, value: 1, to: startOfToday) ?? now
+    }
+
+    func dayKey(for date: Date) -> String {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        return f.string(from: date)
+    }
+
+    func dateFromKey(_ key: String) -> Date? {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        return f.date(from: key)
+    }
+
+    func isYesterday(_ date: Date) -> Bool {
+        guard let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: now)
+        else { return false }
+        return Calendar.current.isDate(date, inSameDayAs: yesterday)
+    }
+
+    /// "Yesterday" if the date is yesterday; full weekday name ("Monday") otherwise.
+    func dayName(for date: Date) -> String {
+        if isYesterday(date) { return "Yesterday" }
+        let f = DateFormatter()
+        f.dateFormat = "EEEE"
+        return f.string(from: date)
+    }
+
+    /// "MAY 13" — month abbreviation + day, uppercased.
+    func dateLabel(for date: Date) -> String {
+        let f = DateFormatter()
+        f.dateFormat = "MMM d"
+        return f.string(from: date).uppercased()
     }
 
     func isToday(_ item: TodoItem) -> Bool {
@@ -45,7 +79,6 @@ extension DateServiceProtocol {
         case ..<2:   return "moments"
         case ..<60:  return "\(minutes) minutes"
         default:
-            // Round up if 30+ minutes past the hour, otherwise round down
             let hours = (minutes + 30) / 60
             return hours == 1 ? "1 hour" : "\(hours) hours"
         }
@@ -58,12 +91,8 @@ struct LiveDateService: DateServiceProtocol {
     var now: Date { Date() }
 }
 
-// MARK: - Mock (for testing)
+// MARK: - Mock (for testing / previews)
 
 struct MockDateService: DateServiceProtocol {
     var now: Date
-
-    init(now: Date) {
-        self.now = now
-    }
 }
