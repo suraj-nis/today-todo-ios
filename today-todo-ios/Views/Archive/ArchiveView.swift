@@ -83,8 +83,10 @@ struct ArchiveView: View {
                     .padding(.bottom, Spacing.s3)
 
                 ForEach(viewModel.archivedDays) { day in
-                    ArchiveDaySection(day: day, colors: colors)
-                        .padding(.horizontal, Spacing.lg)
+                    ArchiveDaySection(day: day, colors: colors) {
+                        viewModel.deleteDay(day)
+                    }
+                    .padding(.horizontal, Spacing.lg)
                 }
 
                 Color.clear

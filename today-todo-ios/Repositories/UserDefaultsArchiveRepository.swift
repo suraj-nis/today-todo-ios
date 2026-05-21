@@ -30,6 +30,12 @@ struct UserDefaultsArchiveRepository: ArchiveRepositoryProtocol {
         WidgetCenter.shared.reloadAllTimelines()
     }
 
+    func deleteDay(withId id: UUID) {
+        var existing = loadAll()
+        existing.removeAll { $0.id == id }
+        save(existing)
+    }
+
     /// Builds one ArchivedDay from raw tasks and appends it to the archive.
     /// Skips silently if a day with the same dayKey is already stored.
     func archiveTasks(_ tasks: [TodoItem], for date: Date) {

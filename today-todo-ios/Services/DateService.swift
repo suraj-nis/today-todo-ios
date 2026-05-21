@@ -49,9 +49,9 @@ extension DateServiceProtocol {
         return Calendar.current.isDate(date, inSameDayAs: yesterday)
     }
 
-    /// "Yesterday" if the date is yesterday; full weekday name ("Monday") otherwise.
+    /// Full weekday name ("Monday", "Tuesday", etc.). Never "Yesterday" — that
+    /// is a display concern computed at render time, not a stable stored value.
     func dayName(for date: Date) -> String {
-        if isYesterday(date) { return "Yesterday" }
         let f = DateFormatter()
         f.dateFormat = "EEEE"
         return f.string(from: date)

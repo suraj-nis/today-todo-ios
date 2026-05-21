@@ -28,4 +28,9 @@ final class ArchiveViewModel {
         archivedDays = archiveRepository.loadAll()
             .sorted { $0.date > $1.date }
     }
+
+    func deleteDay(_ day: ArchivedDay) {
+        archiveRepository.deleteDay(withId: day.id)
+        refresh()
+    }
 }

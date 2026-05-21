@@ -14,7 +14,9 @@ struct ArchiveDaySection: View {
 
     let day: ArchivedDay
     let colors: ArchiveColorScheme
+    let onDelete: () -> Void
 
+    @State private var showingDeleteConfirm = false
     @ScaledMetric(relativeTo: .footnote) private var circleSize = AppConstants.archiveCheckCircleSize
 
     // MARK: - Body
@@ -26,15 +28,48 @@ struct ArchiveDaySection: View {
             ForEach(displayTasks, id: \.task.id) { item in
                 taskRow(task: item.task, kind: item.kind)
             }
+
+            HStack {
+                Spacer()
+                deleteButton
+            }
         }
         .padding(.bottom, Spacing.s3)
+        .alert("Remove this day?", isPresented: $showingDeleteConfirm) {
+            Button("Remove", role: .destructive) { onDelete() }
+            Button("Cancel", role: .cancel) {}
+        }
+    }
+
+    // MARK: - Display name
+
+    /// Computes the human-friendly label at render time so "Yesterday" is always
+    /// accurate and never a stale value cached in the model.
+    private var displayDayName: String {
+        Calendar.current.isDateInYesterday(day.date) ? "Yesterday" : day.dayName
+    }
+
+    // MARK: - Delete button
+
+    private var deleteButton: some View {
+        Button {
+            showingDeleteConfirm = true
+        } label: {
+            Image(systemName: "trash")
+                .font(.system(size: 16))
+                .foregroundStyle(Color.inkPrimary)
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Delete \(displayDayName)")
+        .padding(.top, Spacing.xs)
+        .padding(.bottom, Spacing.sm)
     }
 
     // MARK: - Day header
 
     private var dayHeader: some View {
         HStack(alignment: .firstTextBaseline) {
-            Text(day.dayName)
+            Text(displayDayName)
                 .font(.archiveDayName)
                 .foregroundStyle(Color.archiveInkDark)
                 .tracking(-0.4)
@@ -143,7 +178,7 @@ struct ArchiveDaySection: View {
             ArchiveDaySection(
                 day: ArchivedDay(
                     id: UUID(),
-                    dayName: "Yesterday",
+                    dayName: "Monday",
                     date: Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date(),
                     dateLabel: "MAY 18",
                     tasks: [
@@ -159,7 +194,8 @@ struct ArchiveDaySection: View {
                                  expiresAt: Date()),
                     ]
                 ),
-                colors: .make(for: .morning)
+                colors: .make(for: .morning),
+                onDelete: {}
             )
             .padding(.horizontal, Spacing.lg)
         }
@@ -173,7 +209,7 @@ struct ArchiveDaySection: View {
             ArchiveDaySection(
                 day: ArchivedDay(
                     id: UUID(),
-                    dayName: "Yesterday",
+                    dayName: "Monday",
                     date: Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date(),
                     dateLabel: "MAY 18",
                     tasks: [
@@ -189,7 +225,8 @@ struct ArchiveDaySection: View {
                                  expiresAt: Date()),
                     ]
                 ),
-                colors: .make(for: .evening)
+                colors: .make(for: .evening),
+                onDelete: {}
             )
             .padding(.horizontal, Spacing.lg)
         }

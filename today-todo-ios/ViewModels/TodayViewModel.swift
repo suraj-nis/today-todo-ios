@@ -35,6 +35,7 @@ final class TodayViewModel {
         load()
         performDayReset()
         scheduleMidnightReset()
+        items.forEach { scheduleExpiryUIUpdate(for: $0) }
     }
 
     // MARK: - Derived — today filtered (unsorted)
@@ -131,6 +132,7 @@ final class TodayViewModel {
             expiresAt: expiresAt
         )
         items.append(item)
+        scheduleExpiryUIUpdate(for: item)
         persist()
         WidgetCenter.shared.reloadAllTimelines()
         haptics.impact(.soft)
@@ -164,6 +166,7 @@ final class TodayViewModel {
     func refresh() {
         load()
         performDayReset()
+        items.forEach { scheduleExpiryUIUpdate(for: $0) }
     }
 
     // MARK: - Day reset
@@ -187,6 +190,20 @@ final class TodayViewModel {
         persist()
         WidgetCenter.shared.reloadAllTimelines()
         NotificationCenter.default.post(name: .archiveDidUpdate, object: nil)
+    }
+
+    /// Fires exactly at a task's expiry time and reassigns `items` so
+    /// @Observable notifies SwiftUI to redraw the expired row immediately.
+    private func scheduleExpiryUIUpdate(for task: TodoItem) {
+        guard let expiresAt = task.expiresAt,
+              expiresAt > dateService.now,
+              !task.isCompleted else { return }
+
+        let delay = expiresAt.timeIntervalSince(dateService.now)
+        DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
+            guard let self else { return }
+            self.items = self.items
+        }
     }
 
     /// Schedules a single fire exactly at the next midnight, then reschedules
