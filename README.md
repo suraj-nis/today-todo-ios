@@ -102,7 +102,7 @@ The app includes both a small and medium home screen widget built with WidgetKit
 
 **Local notifications** — `NotificationService` is stubbed and the architecture is in place but notifications were not fully wired up within the submission timeframe. The plan was to fire a notification 30 minutes before task expiry and an end-of-day reminder at 9pm for tasks with no expiry set.
 
-**Persistence** — UserDefaults is appropriate here but for an App Store release I would migrate to CoreData for larger datasets, iCloud sync, and more robust querying.
+**CoreData** — UserDefaults is appropriate here but for an App Store release I would migrate to CoreData for larger datasets, iCloud sync, and more robust querying.
 
 **Lock screen widget** — a `.accessoryCircular` widget showing the incomplete task count would be a natural extension of the home screen widgets.
 
