@@ -48,6 +48,10 @@ DesignExport/
 # ── Crash logs ───────────────────────────────────────────────────────────────
 *.crash
 
+# ── Claude Code chat sessions ────────────────────────────────────────────────
+# Contains personal info (email, name, local paths) — never commit.
+ClaudeChatSessions/
+
 # ── Secrets & certificates ───────────────────────────────────────────────────
 .env
 .env.*
