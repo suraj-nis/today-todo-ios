@@ -10,6 +10,8 @@ Today. is a minimal iOS todo app built around a single constraint: tasks belong 
 
 Demo - https://youtube.com/shorts/8rs9QgtQQ14
 
+For the Demo App, there is a Simulate Day Reset button on the home page. This is just for the purpose of showing how the archive page works for time sake when midnight hits.
+
 ## Screenshots
 
 ### Today View — Morning · Midday · Evening
@@ -27,7 +29,7 @@ The Archive tab inherits the same time-of-day background as the Today tab so the
 
 ## Overall Approach
 
-### Design → Code
+### Claude Design → Claude Code
 
 Before writing any Swift I designed the entire app in Claude Design, producing a complete design system: full light and dark color palettes, a typography scale using Fraunces serif and Geist sans, a 4pt spacing grid, corner radii, shadow levels, and a full animation spec with named easing curves. This was exported as `Today.html` and `tokens.js` and placed in a `DesignExport/` folder at the project root.
 
