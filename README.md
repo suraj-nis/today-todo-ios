@@ -129,4 +129,4 @@ The app includes both a small and medium home screen widget built with WidgetKit
 
 ## AI Tool Usage
 
-This project was built using Claude as the primary development tool across design, architecture, and implementation. A full record of all Claude conversations — including Claude Design sessions and all six Claude Code sessions with complete prompt and response history — is included in the `claudechatsessions/` folder in this repository. The `CONTEXT.md` file at the project root documents the architectural rules and agent instructions used throughout.
+This project was built using Claude as the primary development tool across design, architecture, and implementation. The `CONTEXT.md` file at the project root documents the architectural rules and agent instructions used throughout.
