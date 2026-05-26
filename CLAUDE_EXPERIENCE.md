@@ -22,7 +22,7 @@ Before writing any code I created a CONTEXT.md file, a persistent briefing docum
 
 My workflow was: let Claude Code build the screen first, then fix it myself. AI gets about 90% done fast but lacks precision. Things like letter spacing, font weights, and subtle layout details always needed manual correction. A skilled Swift developer could probably nail the design in one shot.
 
-What's interesting is Claude Code relies heavily on the design specs and tends to hide all its values in a separate constants file rather than using native iOS layout tools like Spacer(), which automatically distributes space without fixed numbers. A good Swift developer instinctively reaches for these adaptive primitives. Claude reaches for magic numbers and tries to tuck them away neatly.
+What's interesting is Claude Code relies heavily on the design specs and tends to hide all its values in a separate constants file rather than using native iOS layout tools like Spacer(), which automatically distributes space without fixed numbers. A good Swift developer instinctively reaches for these adaptive primitives. However, Claude instinctively reaches for magic numbers and tries to tuck them away neatly. I imagine this could be fixed with better prompting, but this would catch someone with no expierence in Swift off guard.
 
 ---
 
