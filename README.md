@@ -1,3 +1,7 @@
+## AI Tool Usage
+
+For a detailed breakdown of my experience building with Claude Design and Claude Code, see [CLAUDE_EXPERIENCE.md](CLAUDE_EXPERIENCE.md).
+
 # Today.
 
 *A daily task app with one rule — tasks only live for today.*
@@ -127,6 +131,4 @@ The app includes both a small and medium home screen widget built with WidgetKit
 ---
 
 
-## AI Tool Usage
 
-This project was built using Claude as the primary development tool across design, architecture, and implementation. The `CONTEXT.md` file at the project root documents the architectural rules and agent instructions used throughout.
