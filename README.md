@@ -1,4 +1,4 @@
-## AI Tool Usage
+# AI Tool Usage
 
 For a detailed breakdown of my experience building with Claude Design and Claude Code, see [CLAUDE_EXPERIENCE.md](CLAUDE_EXPERIENCE.md).
 
